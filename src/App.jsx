@@ -300,20 +300,20 @@ const App = () => {
             <Button className="instagram-btn" onClick={showFriendRequestsModal}>
               Friend Requests
             </Button>
-            <Button className="instagram-btn" onClick={showFollowedUsersModal}>
+            <Button className="ant-btn-danger" onClick={showFollowedUsersModal}>
               Followed Users
             </Button>
-            <Button className="instagram-btn" onClick={showFollowersModal}>
+            <Button className="ant-btn-danger" onClick={showFollowersModal}>
               Followers
             </Button>
             <p className="welcome-text">Welcome, {user.name}!</p>
           </>
         ) : (
           <>
-            <Button className="instagram-btn" onClick={showLoginModal}>
+            <Button className="ant-btn-danger" onClick={showLoginModal}>
               Login
             </Button>
-            <Button className="instagram-btn" onClick={showRegisterModal}>
+            <Button className="ant-btn-danger" onClick={showRegisterModal}>
               Register
             </Button>
           </>
