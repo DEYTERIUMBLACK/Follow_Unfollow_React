@@ -1,0 +1,70 @@
+/* App.css */
+
+body {
+    background-color: #fafafa; /* Light gray background similar to Instagram */
+  }
+  
+  .app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .main-content {
+    padding: 20px;
+  }
+  
+  .user-cards {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .user-card {
+    width: 200px;
+    margin: 10px;
+    padding: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+  
+  .user-name {
+    font-weight: bold;
+  }
+  
+  .user-email {
+    color: #777;
+  }
+  
+  .ant-btn-primary {
+    background-color: #0095f6;
+    color: #fff;
+    border-color: #0095f6;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #0077c0;
+    border-color: #0077c0;
+  }
+  
+  .ant-btn-danger {
+    background-color: #ed4956;
+    color: #fff;
+    border-color: #ed4956;
+  }
+  
+  .ant-btn-danger:hover {
+    background-color: #bf365c;
+    border-color: #bf365c;
+  }
+  
+  

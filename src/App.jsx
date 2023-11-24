@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Modal, Card, message } from 'antd';
 import axios from 'axios';
-
+import './App.css';
 const App = () => {
   const [formLogin] = Form.useForm();
   const [formRegister] = Form.useForm();
@@ -10,7 +10,9 @@ const App = () => {
   const [registerModalVisible, setRegisterModalVisible] = useState(false);
   const [followedUsersModalVisible, setFollowedUsersModalVisible] = useState(false);
   const [friendRequestsModalVisible, setFriendRequestsModalVisible] = useState(false);
+  const [followersModalVisible, setFollowersModalVisible] = useState(false);
   const [users, setUsers] = useState([]);
+  const [followers, setFollowers] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -24,6 +26,21 @@ const App = () => {
 
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const fetchFollowers = async () => {
+      try {
+        if (user) {
+          const response = await axios.get(`https://655edfad879575426b4414a1.mockapi.io/users/${user.id}`);
+          setFollowers(response.data.friends.map((friendId) => users.find((u) => u.id === friendId)));
+        }
+      } catch (error) {
+        console.error('Error fetching followers:', error);
+      }
+    };
+
+    fetchFollowers();
+  }, [user, users]);
 
   const sendFriendRequest = async (userId) => {
     try {
@@ -215,29 +232,88 @@ const App = () => {
       </div>
     </Modal>
   );
+  const showFollowersModal = () => {
+    setFollowersModalVisible(true);
+  };
+
+  const handleCancelFollowersModal = () => {
+    setFollowersModalVisible(false);
+  };
+
+  const handleDeleteFollower = async (followerId) => {
+    try {
+      const updatedUser = { ...user, friends: user.friends.filter((friendId) => friendId !== followerId) };
+      await axios.put(`https://655edfad879575426b4414a1.mockapi.io/users/${user.id}`, updatedUser);
+
+      const updatedFollower = users.find((u) => u.id === followerId);
+      const updatedFollowerWithoutUser = { ...updatedFollower, friends: updatedFollower.friends.filter((friendId) => friendId !== user.id) };
+      await axios.put(`https://655edfad879575426b4414a1.mockapi.io/users/${followerId}`, updatedFollowerWithoutUser);
+
+      message.success('Follower deleted successfully');
+      setUser(updatedUser);
+      setFollowers((prevFollowers) => prevFollowers.filter((follower) => follower.id !== followerId));
+      setUsers((prevUsers) =>
+        prevUsers.map((u) => (u.id === followerId ? updatedFollowerWithoutUser : u))
+      );
+    } catch (error) {
+      console.error('Error deleting follower:', error);
+      message.error('Failed to delete follower');
+    }
+  };
+  const FollowersModal = () => (
+    <Modal
+      title="Followers"
+      visible={followersModalVisible}
+      onCancel={handleCancelFollowersModal}
+      footer={[
+        <Button key="back" onClick={handleCancelFollowersModal}>
+          Close
+        </Button>,
+      ]}
+    >
+      <div>
+        <h2>Your Followers</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          {user &&
+            followers.map((follower) => (
+              <Card key={follower.id} style={{ width: 200, margin: 10 }}>
+                <p>Name: {follower.name}</p>
+                <p>Email: {follower.mail}</p>
+                <Button type="primary" danger onClick={() => handleDeleteFollower(follower.id)}>
+                  Delete Follower
+                </Button>
+              </Card>
+            ))}
+        </div>
+      </div>
+    </Modal>
+  );
 
   return (
-    <div>
-      <nav>
+    <div className="app-container">
+      <nav className="navbar">
         {user ? (
           <>
-            <Button type="primary" onClick={handleLogout}>
+            <Button className="instagram-btn" onClick={handleLogout}>
               Logout
             </Button>
-            <Button type="primary" onClick={showFriendRequestsModal}>
+            <Button className="instagram-btn" onClick={showFriendRequestsModal}>
               Friend Requests
             </Button>
-            <Button type="primary" onClick={showFollowedUsersModal}>
+            <Button className="instagram-btn" onClick={showFollowedUsersModal}>
               Followed Users
             </Button>
-            <p>Welcome, {user.name}!</p>
+            <Button className="instagram-btn" onClick={showFollowersModal}>
+              Followers
+            </Button>
+            <p className="welcome-text">Welcome, {user.name}!</p>
           </>
         ) : (
           <>
-            <Button type="primary" onClick={showLoginModal}>
+            <Button className="instagram-btn" onClick={showLoginModal}>
               Login
             </Button>
-            <Button type="primary" onClick={showRegisterModal}>
+            <Button className="instagram-btn" onClick={showRegisterModal}>
               Register
             </Button>
           </>
@@ -245,19 +321,19 @@ const App = () => {
       </nav>
 
       {user ? (
-        <div>
+        <div className="main-content">
           <h2>Other Users</h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+          <div className="user-cards">
             {filteredUsers.map((otherUser) => (
-              <Card key={otherUser.id} style={{ width: 200, margin: 10 }}>
-                <p>Name: {otherUser.name}</p>
-                <p>Email: {otherUser.mail}</p>
+              <Card key={otherUser.id} className="user-card">
+                <p className="user-name">{otherUser.name}</p>
+                <p className="user-email">{otherUser.mail}</p>
                 {user.friends.includes(otherUser.id) ? (
-                  <Button type="primary" onClick={() => handleUnfollow(otherUser.id)}>
+                  <Button className="instagram-btn" onClick={() => handleUnfollow(otherUser.id)}>
                     Unfollow
                   </Button>
                 ) : (
-                  <Button type="primary" onClick={() => sendFriendRequest(otherUser.id)}>
+                  <Button className="instagram-btn" onClick={() => sendFriendRequest(otherUser.id)}>
                     Add Friend
                   </Button>
                 )}
@@ -343,6 +419,7 @@ const App = () => {
       </Modal>
 
       <FriendRequestsModal />
+      <FollowersModal/>
     </div>
   );
 };
